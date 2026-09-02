@@ -1,0 +1,7 @@
+/build/
+/recordings/*
+!/recordings/.gitkeep
+/results/*
+!/results/.gitkeep
+*.log
+.DS_Store
