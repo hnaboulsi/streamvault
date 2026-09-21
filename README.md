@@ -2,6 +2,8 @@
 
 C++20 telemetry recorder and timed replay pipeline for measuring loss, ordering, latency, and queue pressure in asynchronous sensor streams.
 
+![Benchmark results](media/benchmark-results.svg)
+
 ## Why I Built It
 
 Telemetry demos often hide the behavior that matters under loss or load. I built StreamVault as a small, inspectable reference system where packet handling, bounded buffering, timing, and replay can be measured directly.
@@ -37,7 +39,7 @@ The receive loop remains responsible for packet validation and ordering observat
 
 ## Results
 
-The verified reference run passes 13 CTest cases, including localhost UDP integration. The supplied scenarios measured 29 missing packets in the injected-loss case and recorded 5,008 packets in the high-rate case without a queue drop. The benchmark script writes machine-specific JSON under `results/`; generated output is intentionally ignored.
+The fresh local run passes 13 CTest cases, including localhost UDP integration. The four scenarios measured 0.120 ms mean latency nominally, 6.253 ms under injected latency, 29 missing packets under packet loss, and 5,004 received records in the high-rate case without a queue drop. The benchmark script writes machine-specific JSON under `results/`; generated output is intentionally ignored.
 
 This is a single-host reference implementation. It has no retransmission, authentication, encryption, clock synchronization, file rotation, or cross-machine latency claim.
 
