@@ -1,17 +1,23 @@
 # StreamVault
 
-[![CI](https://github.com/hnaboulsi/streamvault/actions/workflows/ci.yml/badge.svg)](https://github.com/hnaboulsi/streamvault/actions/workflows/ci.yml)
-![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus)
-![Platform](https://img.shields.io/badge/platform-Linux-FCC624?logo=linux&logoColor=black)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-
-**A compact, interview-friendly telemetry recorder and replay system built with C++20, UDP, and bounded-memory concurrency.**
+A C++20 telemetry recorder and replay system built to make timing, loss, and ordering in asynchronous sensor streams observable and repeatable.
 
 StreamVault runs three independent IMU-like, GPS-like, and temperature-like producers over localhost UDP. A central recorder validates datagrams, measures timing and loss, passes records through a bounded queue, and writes a binary session from a dedicated thread. The replay tool reproduces the recorder's original receive-time spacing at configurable speeds.
 
-This is an educational systems project, not production-ready telemetry infrastructure. Recording and replay matter because asynchronous sensor streams are difficult to debug from live behavior alone: a timestamped session makes timing, loss, and ordering observable and repeatable.
+This is a bounded, single-host reference implementation rather than production telemetry infrastructure. It is intentionally explicit about its wire format, queue behavior, timestamps, and failure modes so the measurements can be inspected instead of inferred.
 
-## Highlights
+## Demo / Results
+
+The supplied benchmark script runs baseline, injected-loss, injected-latency, and high-rate cases. On the verified reference run, the loss case found 29 missing packets and the high-rate case recorded 5,008 packets without a queue drop. `ctest` passes 13 cases, including a real localhost UDP integration test, and the same build is exercised by Ubuntu CI.
+
+```bash
+./scripts/run_demo.sh
+./scripts/run_benchmarks.sh
+```
+
+Generated sessions and summaries are written under `recordings/` and `results/`; they are intentionally ignored so results always correspond to the machine and revision being tested.
+
+## What I Built
 
 - Five focused executables with useful `--help` output
 - Explicit, versioned binary wire and session formats
@@ -21,7 +27,7 @@ This is an educational systems project, not production-ready telemetry infrastru
 - GoogleTest coverage plus a real localhost UDP integration test
 - Reproducible demo, four benchmark scenarios, and Ubuntu CI
 
-## Quick start
+## Running It
 
 ```bash
 ./scripts/setup_ubuntu.sh
@@ -31,7 +37,7 @@ ctest --test-dir build --output-on-failure
 ./scripts/run_demo.sh
 ```
 
-## Architecture and data flow
+## How It Works
 
 ```mermaid
 flowchart LR
@@ -89,7 +95,7 @@ Every producer supports intentional drops, fixed delay, and uniform integer jitt
 
 The shutdown JSON reports duration, malformed packets, queue capacity/high-water/drop counts, per-source received and missing counts, and measured mean, minimum, maximum, p50, and p99 generation-to-receive latency. Percentiles use nearest rank after sorting samples. Negative latency is retained rather than hidden because a wall-clock adjustment is itself relevant evidence.
 
-## Build and test
+## Tests
 
 Ubuntu dependencies can be installed with:
 
